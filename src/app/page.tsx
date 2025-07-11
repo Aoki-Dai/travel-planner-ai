@@ -251,9 +251,9 @@ export default function Home() {
                   <CardContent className="pt-6">
                     <div className="space-y-4">
                       {parsedPlan.dailyPlans[0]?.itinerary.map((item, index) => (
-                        <div key={index} className="flex items-start gap-4 p-3 transition-colors border-l-4 border-blue-500 rounded-lg bg-blue-50/50 hover:bg-blue-50">
+                        <div key={index} className="flex items-start gap-4 p-3 transition-colors rounded-lg bg-gray-50 hover:bg-gray-100">
                           <div className="flex-shrink-0">
-                            <span className="px-2 py-1 text-sm font-semibold text-blue-700 bg-white border rounded">
+                            <span className="px-2 py-1 text-sm font-semibold text-gray-700 bg-white border rounded">
                               {item.time}
                             </span>
                           </div>
@@ -313,7 +313,7 @@ export default function Home() {
                             <Card>
                               <CardHeader className="pb-3">
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                  <span className="px-2 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                                  <span className="px-2 py-1 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">
                                     {day.day}日目
                                   </span>
                                   {day.date}
@@ -322,9 +322,9 @@ export default function Home() {
                               <CardContent>
                                 <div className="space-y-4">
                                   {day.itinerary.map((item, index) => (
-                                    <div key={index} className="flex items-start gap-4 p-3 transition-colors border-l-4 border-blue-500 rounded-lg bg-blue-50/50 hover:bg-blue-50">
+                                    <div key={index} className="flex items-start gap-4 p-3 transition-colors border-l-4 border-gray-500 rounded-lg bg-gray-50 hover:bg-gray-100">
                                       <div className="flex-shrink-0">
-                                        <span className="px-2 py-1 text-sm font-semibold text-blue-700 bg-white border rounded">
+                                        <span className="px-2 py-1 text-sm font-semibold text-gray-700 bg-white border rounded">
                                           {item.time}
                                         </span>
                                       </div>
