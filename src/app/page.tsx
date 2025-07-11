@@ -66,17 +66,17 @@ export default function Home() {
   });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+    <main className="flex flex-col items-center justify-center min-h-screen p-24">
       <Card className="w-[450px]">
         <CardHeader>
-          <CardTitle>AI トラベルプランナー</CardTitle>
+          <CardTitle>Travel Planner AI</CardTitle>
           <CardDescription>
             AIがあなたの次の旅行プランを生成します。
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <div className="grid w-full items-center gap-4">
+            <div className="grid items-center w-full gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Input
                   id="prompt"
@@ -95,11 +95,11 @@ export default function Home() {
           {error && <p className="text-red-500">エラー: {error.message}</p>}
           {parsedPlan ? (
             <div className="w-full">
-              <h3 className="font-bold text-lg mb-2">{parsedPlan.destination}への旅行プラン</h3>
-              <p className="text-sm text-gray-600 mb-3">日付: {parsedPlan.date}</p>
+              <h3 className="mb-2 text-lg font-bold">{parsedPlan.destination}への旅行プラン</h3>
+              <p className="mb-3 text-sm text-gray-600">日付: {parsedPlan.date}</p>
               <ul className="space-y-2">
                 {parsedPlan.itinerary.map((item, index) => (
-                  <li key={index} className="border-l-2 border-blue-500 pl-3">
+                  <li key={index} className="pl-3 border-l-2 border-blue-500">
                     <span className="font-semibold">{item.time}</span>: {item.activity}
                   </li>
                 ))}
@@ -107,8 +107,8 @@ export default function Home() {
             </div>
           ) : rawResponse ? (
             <div className="w-full">
-              <h3 className="font-bold text-lg mb-2">AI応答 (JSONパースに失敗)</h3>
-              <pre className="text-sm bg-gray-100 p-3 rounded overflow-auto max-h-40">
+              <h3 className="mb-2 text-lg font-bold">AI応答 (JSONパースに失敗)</h3>
+              <pre className="p-3 overflow-auto text-sm bg-gray-100 rounded max-h-40">
                 {rawResponse}
               </pre>
             </div>
