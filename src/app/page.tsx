@@ -58,7 +58,7 @@ export default function Home() {
   const [isEndDateOpen, setIsEndDateOpen] = React.useState(false);
   const [currentTabPage, setCurrentTabPage] = React.useState(0); // タブページネーション用
 
-  const { input, handleInputChange, handleSubmit, isLoading, error, setInput } = useChat({
+  const { handleSubmit, isLoading, error, setInput } = useChat({
     api: "/api/plan",
     onFinish: (message) => {
       setRawResponse(message.content);
@@ -132,7 +132,7 @@ export default function Home() {
     const syntheticEvent = {
       preventDefault: () => {},
       target: { elements: { message: { value: formattedInput } } }
-    } as any;
+    } as unknown as React.FormEvent<HTMLFormElement>;
     
     handleSubmit(syntheticEvent);
   };

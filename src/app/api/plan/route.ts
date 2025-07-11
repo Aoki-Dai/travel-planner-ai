@@ -56,24 +56,6 @@ export async function POST(req: Request) {
     apiKey: process.env.GOOGLE_API_KEY,
   });
 
-  // 複数日程対応のプロンプト
-  const generateDaysArray = () => {
-    const daysArray = [];
-    for (let i = 0; i < days; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(currentDate.getDate() + i);
-      daysArray.push({
-        day: i + 1,
-        date: currentDate.toLocaleDateString('ja-JP'),
-        itinerary: [
-          { time: "09:00", activity: `${i + 1}日目の朝食・ホテル出発` },
-          { time: "10:00", activity: `${i + 1}日目の観光スポット1` }
-        ]
-      });
-    }
-    return daysArray;
-  };
-
   const prompt = `
     あなたはプロの旅行プランナーです。
     以下の条件に基づいて、最高の旅行プランを生成してください。
