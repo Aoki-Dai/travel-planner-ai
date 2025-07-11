@@ -55,9 +55,9 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Travel Planner</CardTitle>
+          <CardTitle>AI トラベルプランナー</CardTitle>
           <CardDescription>
-            AI-powered travel planner to generate your next itinerary.
+            AIがあなたの次の旅行プランを生成します。
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -66,7 +66,7 @@ export default function Home() {
               <div className="flex flex-col space-y-1.5">
                 <Input
                   id="destination"
-                  placeholder="Destination"
+                  placeholder="目的地"
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                 />
@@ -82,7 +82,7 @@ export default function Home() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                      {date ? format(date, "PPP") : <span>日付を選択</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -95,14 +95,14 @@ export default function Home() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <Button type="submit">Generate Plan</Button>
+              <Button type="submit">プランを生成</Button>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           {plan ? (
             <div>
-              <h3 className="font-bold">Your Plan for {plan.destination}</h3>
+              <h3 className="font-bold">{plan.destination}への旅行プラン</h3>
               <ul>
                 {plan.itinerary.map((item, index) => (
                   <li key={index}>
@@ -112,7 +112,7 @@ export default function Home() {
               </ul>
             </div>
           ) : (
-            <p>Your generated plan will appear here.</p>
+            <p>生成されたプランがここに表示されます。</p>
           )}
         </CardFooter>
       </Card>
