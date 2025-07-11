@@ -1,23 +1,35 @@
-import { NextResponse } from 'next/server';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { streamText } from 'ai';
 
-export async function POST(request: Request) {
-  const body = await request.json();
-  const { destination, date } = body;
+export const maxDuration = 30;
 
-  // In a real application, you would use the destination and date
-  // to generate a travel plan, e.g., by calling an AI model.
+export async function POST(req: Request) {
+  const { destination, date } = await req.json();
 
-  // For now, we'll just return a dummy plan.
-  const dummyPlan = {
-    destination,
-    date,
-    itinerary: [
-      { time: '10:00', activity: '有名な観光名所を訪問' },
-      { time: '12:30', activity: '地元のレストランで昼食' },
-      { time: '14:00', activity: '街の中心部を散策' },
-      { time: '18:00', activity: '景色の良いレストランで夕食' },
-    ],
-  };
+  const google = createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_API_KEY,
+  });
 
-  return NextResponse.json(dummyPlan);
+  const prompt = `
+    あなたはプロの旅行プランナーです。
+    以下の条件に基づいて、最高の旅行プランを生成してください。
+
+    # 条件
+    - 目的地: ${destination}
+    - 日付: ${new Date(date).toLocaleDateString('ja-JP')}
+    - 出力形式: マークダウン形式で、時間とアクティビティをリスト表示してください。
+      例:
+      ### 1日目
+      - 10:00 〇〇に到着、ホテルにチェックイン
+      - 12:00 △△でランチ
+      - 14:00 □□を観光
+      - 18:00 ▽▽でディナー
+  `;
+
+  const result = await streamText({
+    model: google('models/gemini-1.5-flash-latest'),
+    prompt,
+  });
+
+  return result.toAIStreamResponse();
 }

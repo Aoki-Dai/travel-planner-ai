@@ -3,6 +3,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useChat } from "ai/react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,38 +23,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-interface ItineraryItem {
-  time: string;
-  activity: string;
-}
-
-interface TravelPlan {
-  destination: string;
-  date: string;
-  itinerary: ItineraryItem[];
-}
-
 export default function Home() {
   const [destination, setDestination] = React.useState("");
   const [date, setDate] = React.useState<Date>();
-  const [plan, setPlan] = React.useState<TravelPlan | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/plan", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ destination, date: date?.toISOString() }),
-    });
-    const data = await res.json();
-    setPlan(data);
-  };
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+    api: "/api/plan",
+    body: {
+      destination,
+      date: date?.toISOString(),
+    },
+  });
+
+  const latestMessageContent = messages.length > 0 ? messages[messages.length - 1].content : "";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <Card className="w-[350px]">
+      <Card className="w-[450px]">
         <CardHeader>
           <CardTitle>AI トラベルプランナー</CardTitle>
           <CardDescription>
@@ -95,21 +81,17 @@ export default function Home() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <Button type="submit">プランを生成</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "生成中..." : "プランを生成"}
+              </Button>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          {plan ? (
-            <div>
-              <h3 className="font-bold">{plan.destination}への旅行プラン</h3>
-              <ul>
-                {plan.itinerary.map((item, index) => (
-                  <li key={index}>
-                    {item.time}: {item.activity}
-                  </li>
-                ))}
-              </ul>
+        <CardFooter className="flex flex-col items-start w-full">
+          {error && <p className="text-red-500">エラー: {error.message}</p>}
+          {latestMessageContent ? (
+            <div className="prose prose-sm max-w-full">
+              <pre className="whitespace-pre-wrap">{latestMessageContent}</pre>
             </div>
           ) : (
             <p>生成されたプランがここに表示されます。</p>
