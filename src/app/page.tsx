@@ -23,19 +23,47 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+interface ItineraryItem {
+  time: string;
+  activity: string;
+}
+
+interface TravelPlan {
+  destination: string;
+  date: string;
+  itinerary: ItineraryItem[];
+}
+
 export default function Home() {
-  const [destination, setDestination] = React.useState("");
-  const [date, setDate] = React.useState<Date>();
+  const [parsedPlan, setParsedPlan] = React.useState<TravelPlan | null>(null);
+  const [rawResponse, setRawResponse] = React.useState<string>("");
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: "/api/plan",
-    body: {
-      destination,
-      date: date?.toISOString(),
+    onFinish: (message) => {
+      setRawResponse(message.content); // 生のレスポンスを保存
+      
+      try {
+        let content = message.content;
+        
+        // Markdownコードブロックが含まれている場合は除去
+        const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          content = jsonMatch[1];
+        }
+        
+        // ```で囲まれていない場合でも、前後の余分な文字を除去
+        content = content.trim();
+        
+        const plan = JSON.parse(content) as TravelPlan;
+        setParsedPlan(plan);
+      } catch (e) {
+        console.error("Failed to parse AI response as JSON:", e);
+        console.error("AI response content:", message.content);
+        setParsedPlan(null);
+      }
     },
   });
-
-  const latestMessageContent = messages.length > 0 ? messages[messages.length - 1].content : "";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
@@ -51,35 +79,11 @@ export default function Home() {
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Input
-                  id="destination"
-                  placeholder="目的地"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
+                  id="prompt"
+                  placeholder="目的地と日付を入力してください (例: 東京 2025-07-20)"
+                  value={input}
+                  onChange={handleInputChange}
                 />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>日付を選択</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
               </div>
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? "生成中..." : "プランを生成"}
@@ -89,9 +93,24 @@ export default function Home() {
         </CardContent>
         <CardFooter className="flex flex-col items-start w-full">
           {error && <p className="text-red-500">エラー: {error.message}</p>}
-          {latestMessageContent ? (
-            <div className="prose prose-sm max-w-full">
-              <pre className="whitespace-pre-wrap">{latestMessageContent}</pre>
+          {parsedPlan ? (
+            <div className="w-full">
+              <h3 className="font-bold text-lg mb-2">{parsedPlan.destination}への旅行プラン</h3>
+              <p className="text-sm text-gray-600 mb-3">日付: {parsedPlan.date}</p>
+              <ul className="space-y-2">
+                {parsedPlan.itinerary.map((item, index) => (
+                  <li key={index} className="border-l-2 border-blue-500 pl-3">
+                    <span className="font-semibold">{item.time}</span>: {item.activity}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : rawResponse ? (
+            <div className="w-full">
+              <h3 className="font-bold text-lg mb-2">AI応答 (JSONパースに失敗)</h3>
+              <pre className="text-sm bg-gray-100 p-3 rounded overflow-auto max-h-40">
+                {rawResponse}
+              </pre>
             </div>
           ) : (
             <p>生成されたプランがここに表示されます。</p>
