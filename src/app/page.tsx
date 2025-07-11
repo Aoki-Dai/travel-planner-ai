@@ -322,7 +322,7 @@ export default function Home() {
                               <CardContent>
                                 <div className="space-y-4">
                                   {day.itinerary.map((item, index) => (
-                                    <div key={index} className="flex items-start gap-4 p-3 transition-colors border-l-4 border-gray-500 rounded-lg bg-gray-50 hover:bg-gray-100">
+                                    <div key={index} className="flex items-start gap-4 p-3 transition-colors rounded-lg bg-gray-50 hover:bg-gray-100">
                                       <div className="flex-shrink-0">
                                         <span className="px-2 py-1 text-sm font-semibold text-gray-700 bg-white border rounded">
                                           {item.time}
