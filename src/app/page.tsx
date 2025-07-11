@@ -1,18 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { useChat } from "ai/react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import {
   Card,
@@ -38,7 +29,7 @@ export default function Home() {
   const [parsedPlan, setParsedPlan] = React.useState<TravelPlan | null>(null);
   const [rawResponse, setRawResponse] = React.useState<string>("");
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+  const { input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: "/api/plan",
     onFinish: (message) => {
       setRawResponse(message.content); // 生のレスポンスを保存
