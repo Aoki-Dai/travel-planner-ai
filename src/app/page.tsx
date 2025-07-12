@@ -57,6 +57,18 @@ export default function Home() {
   const [isStartDateOpen, setIsStartDateOpen] = React.useState(false);
   const [isEndDateOpen, setIsEndDateOpen] = React.useState(false);
   const [currentTabPage, setCurrentTabPage] = React.useState(0); // タブページネーション用
+  const [isMobile, setIsMobile] = React.useState(false); // モバイル判定用
+
+  // モバイル判定
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { handleSubmit, isLoading, error, setInput } = useChat({
     api: "/api/plan",
@@ -268,7 +280,7 @@ export default function Home() {
               ) : (
                 // 複数日プランのタブ表示
                 (() => {
-                  const TABS_PER_PAGE = 7;
+                  const TABS_PER_PAGE = isMobile ? 5 : 7; // モバイルでは5日、デスクトップでは7日
                   const totalPages = Math.ceil(parsedPlan.days / TABS_PER_PAGE);
                   const currentStartDay = currentTabPage * TABS_PER_PAGE + 1;
                   const currentEndDay = Math.min((currentTabPage + 1) * TABS_PER_PAGE, parsedPlan.days);
@@ -277,37 +289,56 @@ export default function Home() {
                   return (
                     <div className="space-y-4">
                       {totalPages > 1 && (
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCurrentTabPage(Math.max(0, currentTabPage - 1))}
                             disabled={currentTabPage === 0}
+                            className="text-xs md:text-sm"
                           >
-                            ← 前の週
+                            ← 前
                           </Button>
-                          <span className="text-sm text-gray-600">
-                            {currentStartDay}日目 - {currentEndDay}日目 ({currentTabPage + 1}/{totalPages}ページ)
+                          <span className="text-xs text-gray-600 md:text-sm">
+                            {currentStartDay}-{currentEndDay}日目 ({currentTabPage + 1}/{totalPages})
                           </span>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => setCurrentTabPage(Math.min(totalPages - 1, currentTabPage + 1))}
                             disabled={currentTabPage === totalPages - 1}
+                            className="text-xs md:text-sm"
                           >
-                            次の週 →
+                            次 →
                           </Button>
                         </div>
                       )}
                       
                       <Tabs defaultValue={`day-${currentStartDay}`} key={currentTabPage} className="w-full">
-                        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${currentDays.length}, 1fr)` }}>
-                          {currentDays.map((day) => (
-                            <TabsTrigger key={day.day} value={`day-${day.day}`}>
-                              {day.day}日目
-                            </TabsTrigger>
-                          ))}
-                        </TabsList>
+                        <div className="w-full overflow-x-auto md:overflow-visible">
+                          <TabsList 
+                            className={cn(
+                              "p-1",
+                              isMobile 
+                                ? "inline-flex space-x-1 min-w-max" 
+                                : "grid w-full"
+                            )}
+                            style={!isMobile ? { gridTemplateColumns: `repeat(${currentDays.length}, 1fr)` } : undefined}
+                          >
+                            {currentDays.map((day) => (
+                              <TabsTrigger 
+                                key={day.day} 
+                                value={`day-${day.day}`}
+                                className={cn(
+                                  "text-xs md:text-sm px-2 md:px-3",
+                                  isMobile ? "flex-shrink-0 min-w-[80px]" : ""
+                                )}
+                              >
+                                {day.day}日目
+                              </TabsTrigger>
+                            ))}
+                          </TabsList>
+                        </div>
                         {currentDays.map((day) => (
                           <TabsContent key={day.day} value={`day-${day.day}`}>
                             <Card>
